@@ -2,9 +2,15 @@ package main
 
 import (
     "log"
-    "fmt"
+    io "fmt"
     "serial"
-    "time"
+    t "time"
+)
+
+var (
+	printf   = io.Printf // Closures for refactored code
+	printfln = io.Println
+	fatal    = log.Fatal
 )
 
 func readChars(s *serial.Port, n int) (buff []byte, amount int) {
@@ -37,8 +43,8 @@ func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
     _, err := s.Write(char)
 
     if err == nil {
-      fmt.Printf("written char: %c (hex: %X)\n", char[0], char[0])
-      time.Sleep(time.Second * time.Duration(tim)) // wait after send
+      printf("written char: %c (hex: %X)\n", char[0], char[0])
+      t.Sleep(t.Second * t.Duration(tim)) // wait after send
       amount++
     } else {
       return
@@ -48,10 +54,10 @@ func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
 }
 
 func main() {
-	c := &serial.Config{Name: "/dev/ttyUSB0", Baud: 9600/*115200*/, ReadTimeout: time.Second * 5}
+	c := &serial.Config{Name: "/dev/ttyUSB0", Baud: 9600/*115200*/, ReadTimeout: t.Second * 5}
   s, err := serial.OpenPort(c)
   if err != nil {
-    log.Fatal(err)
+    fatal(err)
   }
 
 	for {
@@ -60,17 +66,17 @@ func main() {
 
 		if an != 0 {
 		  for i := 0; buf[i] != 0x0; i++ {
-		  	fmt.Printf("char: %c (hex: %X; dec: %d)\n", buf[i], buf[i], buf[i])
+		  	printf("char: %c (hex: %X; dec: %d)\n", buf[i], buf[i], buf[i])
 		  }
 
 			n := writeChars(s, buf, an, 0.25)
 			if n != (an - 1) {
-				fmt.Printf("Written chars < buff-length (length is %d, written %d)\n", an, n)
+				printf("Written chars < buff-length (length is %d, written %d)\n", an, n)
 			}
 		} else {
-			fmt.Println("OK, next;")
+			println("OK, next;")
 		}
 
-		time.Sleep(time.Duration(250) * time.Millisecond)
+		t.Sleep(t.Duration(250) * t.Millisecond)
 	}
 }
