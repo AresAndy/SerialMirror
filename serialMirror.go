@@ -71,6 +71,6 @@ func main() {
 			fmt.Println("OK, next;")
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Duration(250) * time.Millisecond)
 	}
 }
