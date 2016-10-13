@@ -32,13 +32,13 @@ func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
   char := make([]byte, 1)
   amount = 0
 
-  for i := 0; i < n && b[n] != 0x0 ; i++ {
+  for i := 0; i < n - 1 ; i++ {
     char[0] = b[i]
     _, err := s.Write(char)
 
     if err == nil {
       fmt.Printf("written char: %c (hex: %X)\n", char[0], char[0])
-      time.Sleep(time.Second * time.Duration(tim)) // just wait a bit before sending a new char
+      time.Sleep(time.Second * time.Duration(tim)) // wait after send
       amount++
     } else {
       return
@@ -64,8 +64,8 @@ func main() {
 		  }
 
 			n := writeChars(s, buf, an, 0.25)
-			if n != an {
-				fmt.Println("Written chars < buff-length (length is %d, written %d)", an, n)
+			if n != (an - 1) {
+				fmt.Printf("Written chars < buff-length (length is %d, written %d)\n", an, n)
 			}
 		} else {
 			fmt.Println("OK, next;")
