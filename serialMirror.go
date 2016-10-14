@@ -34,7 +34,7 @@ func readChars(s *serial.Port, n int) (buff []byte, amount int) {
   return
 }
 
-func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
+func writeChars(s *serial.Port, b []byte, n, tim int) (amount int) {
   char := make([]byte, 1)
   amount = 0
 
@@ -44,7 +44,7 @@ func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
 
     if err == nil {
       printf("written char: %c (hex: %X)\n", char[0], char[0])
-      t.Sleep(t.Second * t.Duration(tim)) // wait after send
+      t.Sleep(t.Millisecond * t.Duration(tim)) // wait after send
       amount++
     } else {
       return
@@ -54,7 +54,7 @@ func writeChars(s *serial.Port, b []byte, n int, tim float32) (amount int) {
 }
 
 func main() {
-	c := &serial.Config{Name: "/dev/ttyUSB0", Baud: 9600/*115200*/, ReadTimeout: t.Second * 5}
+	c := &serial.Config{Name: "/dev/ttyUSB0", Baud: 9600, ReadTimeout: t.Second * 5}
   s, err := serial.OpenPort(c)
   if err != nil {
     fatal(err)
@@ -69,7 +69,7 @@ func main() {
 		  	printf("char: %c (hex: %X; dec: %d)\n", buf[i], buf[i], buf[i])
 		  }
 
-			n := writeChars(s, buf, an, 0.25)
+			n := writeChars(s, buf, an, 250)
 			if n != (an - 1) {
 				printf("Written chars < buff-length (length is %d, written %d)\n", an, n)
 			}
